@@ -107,8 +107,8 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
   },
   imageContainer: {
-    height: '35%',
-    width: '60%',
+    height: 200,
+    width: 200,
     borderRadius: 500,
     marginBottom: 10,
     shadowColor: '#000',
