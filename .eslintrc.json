@@ -5,7 +5,8 @@
     },
     "extends": [
       "eslint:recommended",
-      "plugin:react/recommended"
+      "plugin:react/recommended",
+      "prettier"
     ],
     "parserOptions": {
         "ecmaFeatures": {
@@ -15,16 +16,14 @@
         "sourceType": "module"
     },
     "plugins": [
-        "react"
+        "react",
+        "prettier"
     ],
     "rules": {
+      "prettier/prettier": ["error"],
         "indent": [
             "error",
-            "tab"
-        ],
-        "linebreak-style": [
-            "error",
-            "windows"
+            2
         ],
         "quotes": [
             "error",
