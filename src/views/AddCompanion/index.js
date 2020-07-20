@@ -5,7 +5,7 @@ import {StackActions} from '@react-navigation/native';
 export const addCompanion = ({navigation}) => {
 	const navigateRegister = () => {
 		navigation.dispatch(
-			StackActions.replace('Login')
+			StackActions.replace('useLogin')
 		);
 	};
 

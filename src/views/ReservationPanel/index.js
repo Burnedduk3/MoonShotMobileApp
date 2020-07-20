@@ -1,17 +1,16 @@
-import { gql, useQuery } from '@apollo/client';
-import { Text } from '@ui-kitten/components';
-import React, { useContext, useEffect } from 'react';
-import { SafeAreaView, StyleSheet } from 'react-native';
 import { StackActions } from '@react-navigation/native';
+import { Text } from '@ui-kitten/components';
+import React, { useEffect, useState } from 'react';
+import { SafeAreaView, StyleSheet } from 'react-native';
 import { Header } from '../../components/Header';
-import { UserInfo } from '../../components/UserInfo';
-import { TokenContext } from '../../Contexts/TokenContext';
-import { UserContext } from '../../Contexts/UserContext';
-import { QueryText, RefreshToken } from './TextConstants';
 
-export const Me = ({ navigation }) => {
-  const { tokens } = useContext(TokenContext);
-  const { user, setUser } = useContext(UserContext);
+export const SeeCalendar = ({ navigation }) => {
+  const [componentLoading, setComponentLoading] = useState(true);
+
+  useEffect(() => {
+    setComponentLoading(false);
+  }, []);
+
   const navigateRegister = () => {
     navigation.dispatch(StackActions.replace('useLogin'));
   };
@@ -20,10 +19,12 @@ export const Me = ({ navigation }) => {
     navigation.dispatch(StackActions.replace('Register'));
   };
 
-  return (
+  return componentLoading ? (
+    <></>
+  ) : (
     <SafeAreaView style={{ flex: 1 }}>
       <Header />
-      <UserInfo />
+      <Text category="h2">Horario</Text>
     </SafeAreaView>
   );
 };

@@ -1,0 +1,133 @@
+import { gql, useQuery } from '@apollo/client';
+import { Layout, Spinner, Text } from '@ui-kitten/components';
+import React, { useContext, useEffect } from 'react';
+import { View } from 'react-native';
+import { TokenContext } from '../../Contexts/TokenContext';
+import { UserContext } from '../../Contexts/UserContext';
+import { QueryText, RefreshToken } from '../../views/Me/TextConstants';
+import { StyleSheet } from 'react-native';
+
+export const UserInfo = (props) => {
+  const { tokens } = useContext(TokenContext);
+  const { user, setUser } = useContext(UserContext);
+  let render = <Spinner size="giant" />;
+  try {
+    const { loading, error, data } = useQuery(
+      gql`
+        ${QueryText}
+      `,
+      {
+        context: {
+          headers: {
+            authorization: `Bearer ${tokens.accessToken}`,
+          },
+        },
+      },
+    );
+    useEffect(() => {
+      if (data) {
+        if (error) throw new Error('Not able to fecth information');
+        setUser({
+          username: data.user.me.username,
+          email: data.user.me.email,
+          name: data.user.me.firstName + ' ' + data.user.me.firstLastname,
+          phone: data.user.me.phone,
+          userID: data.user.me.userID,
+        });
+      }
+    }, [loading]);
+
+    render = loading ? (
+      <Spinner size="giant" />
+    ) : (
+      <Layout style={styles.container}>
+        <View style={styles.infoContainer}>
+          <Text category="h2" style={styles.title}>
+            {user.name}
+          </Text>
+          <View style={styles.specifiedInfo}>
+            <Text category="p1" style={styles.boxTitle}>
+              Datos Personales:
+            </Text>
+            <View style={styles.textContainer}>
+              <Text category="p1" style={styles.header}>
+                Documento:
+              </Text>
+              <Text category="p2" style={styles.text}>
+                {user.userID}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text category="p1" style={styles.header}>
+                Correo:
+              </Text>
+              <Text category="p2" style={styles.text}>
+                {user.email}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text category="p1" style={styles.header}>
+                Telefono:
+              </Text>
+              <Text category="p2" style={styles.text}>
+                {user.phone}
+              </Text>
+            </View>
+          </View>
+        </View>
+      </Layout>
+    );
+  } catch (e) {
+    render = (
+      <Layout style={styles.container}>
+        <Text category="h2">Algo Salio Mal</Text>
+      </Layout>
+    );
+  }
+  return render;
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+    backgroundColor: '#f9fafb',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  infoContainer: {
+    width: '100%',
+    alignItems: 'center',
+  },
+  specifiedInfo: {
+    backgroundColor: '#ffffff',
+    width: '80%',
+    padding: '5%',
+    borderRadius: 15,
+    borderColor: '#adc8e8',
+    borderWidth: 2,
+    marginTop: 20,
+    marginBottom: 20,
+  },
+  title: {
+    color: '#EA3F6A',
+  },
+  boxTitle: {
+    color: '#EA3F6A',
+    marginBottom: 10,
+    fontSize: 18,
+  },
+  textContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignContent: 'space-around',
+    marginTop: 5,
+  },
+  text: {
+    marginLeft: 10,
+  },
+  header: {
+    color: '#adc8e8',
+  },
+});
