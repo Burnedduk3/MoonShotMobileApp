@@ -10,6 +10,7 @@ import { UserContext } from '../../Contexts/UserContext';
 export const Me = (props) => {
   const { setTokens } = useContext(TokenContext);
   const { setUser } = useContext(UserContext);
+
   const navigateRegister = () => {
     props.navigation.dispatch(StackActions.replace('Home'));
   };
@@ -17,7 +18,6 @@ export const Me = (props) => {
   const onLogOut = () => {
     setTokens({ accessToken: '', refreshToken: '' });
     setUser({});
-    navigateRegister();
   };
 
   return (

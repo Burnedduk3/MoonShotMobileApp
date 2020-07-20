@@ -17,6 +17,7 @@ export const UserInfo = () => {
         ${QueryText}
       `,
       {
+        fetchPolicy: 'network-only',
         context: {
           headers: {
             authorization: `Bearer ${tokens.accessToken}`,
@@ -25,20 +26,14 @@ export const UserInfo = () => {
       },
     );
     useEffect(() => {
-      if (data) {
-        if (error) throw new Error('Not able to fecth information');
-        setUser({
-          username: data.user.me.username,
-          email: data.user.me.email,
-          name: data.user.me.firstName + ' ' + data.user.me.firstLastname,
-          phone: data.user.me.phone,
-          userID: data.user.me.userID,
-        });
+      if (!loading && data) {
       }
     }, [loading]);
 
     render = loading ? (
-      <Spinner size="giant" />
+      <Layout style={styles.container}>
+        <Spinner size="giant" />
+      </Layout>
     ) : (
       <Layout style={styles.container}>
         <View style={styles.imageContainer}>
