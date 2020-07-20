@@ -1,39 +1,40 @@
-import { gql, useQuery } from '@apollo/client';
-import { Text } from '@ui-kitten/components';
-import React, { useContext, useEffect } from 'react';
+import { Button } from '@ui-kitten/components';
+import React, { useContext } from 'react';
 import { SafeAreaView, StyleSheet } from 'react-native';
 import { StackActions } from '@react-navigation/native';
 import { Header } from '../../components/Header';
 import { UserInfo } from '../../components/UserInfo';
 import { TokenContext } from '../../Contexts/TokenContext';
 import { UserContext } from '../../Contexts/UserContext';
-import { QueryText, RefreshToken } from './TextConstants';
 
-export const Me = ({ navigation }) => {
-  const { tokens } = useContext(TokenContext);
-  const { user, setUser } = useContext(UserContext);
+export const Me = (props) => {
+  const { setTokens } = useContext(TokenContext);
+  const { setUser } = useContext(UserContext);
   const navigateRegister = () => {
-    navigation.dispatch(StackActions.replace('useLogin'));
+    props.navigation.dispatch(StackActions.replace('Home'));
   };
 
-  const navigateLogin = () => {
-    navigation.dispatch(StackActions.replace('Register'));
+  const onLogOut = () => {
+    setTokens({ accessToken: '', refreshToken: '' });
+    setUser({});
+    navigateRegister();
   };
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#f9fafb' }}>
       <Header />
       <UserInfo />
+      <Button style={styles.button} onPress={onLogOut}>
+        Desconectarse
+      </Button>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  headerImage: {
-    margin: 50,
-  },
   button: {
-    width: '40%',
-    marginBottom: 20,
+    alignSelf: 'center',
+    marginBottom: 50,
+    width: '70%',
   },
 });
