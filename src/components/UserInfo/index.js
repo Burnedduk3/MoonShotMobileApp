@@ -1,16 +1,16 @@
 import { gql, useQuery } from '@apollo/client';
 import { Layout, Spinner, Text } from '@ui-kitten/components';
 import React, { useContext, useEffect } from 'react';
-import { View } from 'react-native';
+import { Image, StyleSheet, View } from 'react-native';
 import { TokenContext } from '../../Contexts/TokenContext';
 import { UserContext } from '../../Contexts/UserContext';
-import { QueryText, RefreshToken } from '../../views/Me/TextConstants';
-import { StyleSheet } from 'react-native';
+import { QueryText } from '../../views/Me/TextConstants';
+import userImage from './../../assets/images/userImage.jpg';
 
-export const UserInfo = (props) => {
+export const UserInfo = () => {
   const { tokens } = useContext(TokenContext);
   const { user, setUser } = useContext(UserContext);
-  let render = <Spinner size="giant" />;
+  let render;
   try {
     const { loading, error, data } = useQuery(
       gql`
@@ -41,6 +41,9 @@ export const UserInfo = (props) => {
       <Spinner size="giant" />
     ) : (
       <Layout style={styles.container}>
+        <View style={styles.imageContainer}>
+          <Image style={styles.headerImage} source={userImage} />
+        </View>
         <View style={styles.infoContainer}>
           <Text category="h2" style={styles.title}>
             {user.name}
@@ -91,10 +94,31 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     width: '100%',
-    height: '100%',
+    height: '80%',
     backgroundColor: '#f9fafb',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  headerImage: {
+    flex: 1,
+    width: null,
+    height: null,
+    borderRadius: 500,
+    resizeMode: 'contain',
+  },
+  imageContainer: {
+    height: '35%',
+    width: '60%',
+    borderRadius: 500,
+    marginBottom: 10,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   infoContainer: {
     width: '100%',
