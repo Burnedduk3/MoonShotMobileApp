@@ -1,9 +1,11 @@
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { RestaurantContext } from '../../Contexts/RestaurantContext';
 import { TokenContext } from '../../Contexts/TokenContext';
 import { UserContext } from '../../Contexts/UserContext';
 import { useTokens, useUser } from '../../hooks/useLogin';
+import { useRestaurant } from '../../hooks/useRestaurant';
 import { CheckReservation } from '../../views/CheckReservation';
 import { HomeScreen } from '../../views/Home';
 import { LoginScreen } from '../../views/Login';
@@ -33,10 +35,13 @@ const HomeNavigator = () => (
 export const AppNavigator = () => {
   const [tokens, setTokens] = useTokens();
   const [user, setUser] = useUser();
+  const [restaurant, setRestaurant] = useRestaurant();
   return (
     <TokenContext.Provider value={{ tokens, setTokens }}>
       <UserContext.Provider value={{ user, setUser }}>
-        <HomeNavigator />
+        <RestaurantContext.Provider value={{ restaurant, setRestaurant }}>
+          <HomeNavigator />
+        </RestaurantContext.Provider>
       </UserContext.Provider>
     </TokenContext.Provider>
   );

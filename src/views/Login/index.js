@@ -47,7 +47,10 @@ export const LoginScreen = (props) => {
         if (data.auth.login.loginWithUsernameAndPassword.error) {
           setError(true);
         } else {
-          if (data.auth.login.loginWithUsernameAndPassword.user.role.name === 'business') {
+          if (
+            data.auth.login.loginWithUsernameAndPassword.user.role.name === 'business' ||
+            data.auth.login.loginWithUsernameAndPassword.user.role.name === 'admin'
+          ) {
             setTokens({
               accessToken: data.auth.login.loginWithUsernameAndPassword.data.accessToken,
               refreshToken: data.auth.login.loginWithUsernameAndPassword.data.refreshToken,
