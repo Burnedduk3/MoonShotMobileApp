@@ -7,6 +7,7 @@ import { useTokens, useUser } from '../../hooks/useLogin';
 import { CheckReservation } from '../../views/CheckReservation';
 import { HomeScreen } from '../../views/Home';
 import { LoginScreen } from '../../views/Login';
+import { ManageRestaurant } from '../../views/ManageRestaurant';
 import { Me } from '../../views/Me';
 import { SeeCalendar } from '../../views/ReservationPanel';
 import BottomTabBar from '../TabBar';
@@ -18,6 +19,7 @@ const TabNavigator = () => (
   <BottomTab.Navigator tabBar={(props) => <BottomTabBar {...props} />}>
     <BottomTab.Screen name="CheckReservation" component={CheckReservation} />
     <BottomTab.Screen name="SeeReservations" component={SeeCalendar} />
+    <BottomTab.Screen name="ManageRestaurant" component={ManageRestaurant} />
     <BottomTab.Screen name="Profile" component={Me} />
   </BottomTab.Navigator>
 );

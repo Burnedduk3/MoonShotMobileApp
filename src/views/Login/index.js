@@ -13,6 +13,7 @@ export const LoginScreen = (props) => {
   const [password, setPassword] = useState('');
   const [secureTextEntry, setSecureTextEntry] = useState(true);
   const [error, setError] = useState(false);
+  const [wrongUser, setWrongUser] = useState(false);
   const [getLogin, { loading, data }] = useLazyQuery(
     gql`
       ${queryConstants.loginUsernamePassword}
@@ -46,13 +47,17 @@ export const LoginScreen = (props) => {
         if (data.auth.login.loginWithUsernameAndPassword.error) {
           setError(true);
         } else {
-          setTokens({
-            accessToken: data.auth.login.loginWithUsernameAndPassword.data.accessToken,
-            refreshToken: data.auth.login.loginWithUsernameAndPassword.data.refreshToken,
-          });
-          setUser(data.auth.login.loginWithUsernameAndPassword.user);
-          if (!error && user && tokens) {
-            navigateMainContent();
+          if (data.auth.login.loginWithUsernameAndPassword.user.role.name === 'business') {
+            setTokens({
+              accessToken: data.auth.login.loginWithUsernameAndPassword.data.accessToken,
+              refreshToken: data.auth.login.loginWithUsernameAndPassword.data.refreshToken,
+            });
+            setUser(data.auth.login.loginWithUsernameAndPassword.user);
+            if (!error && user && tokens) {
+              navigateMainContent();
+            }
+          } else {
+            setWrongUser(true);
           }
         }
       }
@@ -61,6 +66,7 @@ export const LoginScreen = (props) => {
 
   const onModalPressed = () => {
     setError(false);
+    setWrongUser(false);
   };
 
   const renderIcon = (props) => (
@@ -92,6 +98,13 @@ export const LoginScreen = (props) => {
           <ErrorPopUp
             text={TextConstants.modal.text}
             buttonText={TextConstants.modal.button}
+            onModalPressed={onModalPressed}
+          />
+        )}
+        {wrongUser && (
+          <ErrorPopUp
+            text={TextConstants.wrongUser.text}
+            buttonText={TextConstants.wrongUser.button}
             onModalPressed={onModalPressed}
           />
         )}

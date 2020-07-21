@@ -6,83 +6,88 @@ import { TokenContext } from '../../Contexts/TokenContext';
 import { UserContext } from '../../Contexts/UserContext';
 import { QueryText } from '../../views/Me/TextConstants';
 import userImage from './../../assets/images/userImage.jpg';
+import { textConstants } from './TextConstants';
 
 export const UserInfo = () => {
   const { tokens } = useContext(TokenContext);
   const { user, setUser } = useContext(UserContext);
-  let render;
-  try {
-    const { loading, error, data } = useQuery(
-      gql`
-        ${QueryText}
-      `,
-      {
-        fetchPolicy: 'network-only',
-        context: {
-          headers: {
-            authorization: `Bearer ${tokens.accessToken}`,
-          },
+
+  const { loading, error, data } = useQuery(
+    gql`
+      ${QueryText}
+    `,
+    {
+      fetchPolicy: 'network-only',
+      context: {
+        headers: {
+          authorization: `Bearer ${tokens.accessToken}`,
         },
       },
-    );
-    useEffect(() => {
-      if (!loading && data) {
-      }
-    }, [loading]);
+    },
+  );
+  useEffect(() => {
+    if (!loading && data) {
+      setUser({
+        email: data.user.me.email,
+        username: data.user.me.username,
+        name: data.user.me.firstName + ' ' + data.user.me.firstLastname,
+        phone: data.user.me.phone,
+        userID: data.user.me.userID,
+      });
+    }
+  }, [loading]);
 
-    render = loading ? (
-      <Layout style={styles.container}>
-        <Spinner size="giant" />
-      </Layout>
-    ) : (
-      <Layout style={styles.container}>
-        <View style={styles.imageContainer}>
-          <Image style={styles.headerImage} source={userImage} />
-        </View>
-        <View style={styles.infoContainer}>
-          <Text category="h2" style={styles.title}>
-            {user.name}
-          </Text>
-          <View style={styles.specifiedInfo}>
-            <Text category="p1" style={styles.boxTitle}>
-              Datos Personales:
+  return (
+    <Layout style={styles.container}>
+      {loading && <Spinner size="giant" />}
+      {!error && data && (
+        <>
+          <View style={styles.imageContainer}>
+            <Image style={styles.headerImage} source={userImage} />
+          </View>
+          <View style={styles.infoContainer}>
+            <Text category="h2" style={styles.title}>
+              {user.name}
             </Text>
-            <View style={styles.textContainer}>
-              <Text category="p1" style={styles.header}>
-                Documento:
+            <View style={styles.specifiedInfo}>
+              <Text category="p1" style={styles.boxTitle}>
+                {textConstants.viewHeader}
               </Text>
-              <Text category="p2" style={styles.text}>
-                {user.userID}
-              </Text>
-            </View>
-            <View style={styles.textContainer}>
-              <Text category="p1" style={styles.header}>
-                Correo:
-              </Text>
-              <Text category="p2" style={styles.text}>
-                {user.email}
-              </Text>
-            </View>
-            <View style={styles.textContainer}>
-              <Text category="p1" style={styles.header}>
-                Telefono:
-              </Text>
-              <Text category="p2" style={styles.text}>
-                {user.phone}
-              </Text>
+              <View style={styles.textContainer}>
+                <Text category="p1" style={styles.header}>
+                  {textConstants.innerTitles.document}
+                </Text>
+                <Text category="p2" style={styles.text}>
+                  {user.userID}
+                </Text>
+              </View>
+              <View style={styles.textContainer}>
+                <Text category="p1" style={styles.header}>
+                  {textConstants.innerTitles.correo}
+                </Text>
+                <Text category="p2" style={styles.text}>
+                  {user.email}
+                </Text>
+              </View>
+              <View style={styles.textContainer}>
+                <Text category="p1" style={styles.header}>
+                  {textConstants.innerTitles.telefono}
+                </Text>
+                <Text category="p2" style={styles.text}>
+                  {user.phone}
+                </Text>
+              </View>
             </View>
           </View>
-        </View>
-      </Layout>
-    );
-  } catch (e) {
-    render = (
-      <Layout style={styles.container}>
-        <Text category="h2">Algo Salio Mal</Text>
-      </Layout>
-    );
-  }
-  return render;
+        </>
+      )}
+      {error && (
+        <>
+          <Text category="h2">Something Has happened</Text>
+        </>
+      )}
+    </Layout>
+  );
 };
 
 const styles = StyleSheet.create({
@@ -104,12 +109,12 @@ const styles = StyleSheet.create({
   imageContainer: {
     height: 200,
     width: 200,
-    borderRadius: 500,
+    borderRadius: 100,
     marginBottom: 10,
-    shadowColor: '#000',
+    shadowColor: '#000000',
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 10,
     },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,

@@ -16,11 +16,15 @@ query auth($username: String!, $password: String!) {
           id
           userID
           username
+          role{
+            name
+          }
         }
       }
     }
   }
 }
+
 `,
 };
 
@@ -40,6 +44,10 @@ export const TextConstants = {
   },
   modal: {
     text: 'Credenciales Incorrectas',
+    button: 'Listo!',
+  },
+  wrongUser: {
+    text: 'Su rol no es el adecuado',
     button: 'Listo!',
   },
 };

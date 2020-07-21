@@ -3,11 +3,11 @@ import React, { useEffect, useState } from 'react';
 import { SafeAreaView, StyleSheet } from 'react-native';
 import { Header } from '../../components/Header';
 
-export const CheckReservation = ({ navigation }) => {
+export const ManageRestaurant = ({ navigation }) => {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <Header />
-      <Text category="h2">Check</Text>
+      <Text category="h2">Restaurant</Text>
     </SafeAreaView>
   );
 };
