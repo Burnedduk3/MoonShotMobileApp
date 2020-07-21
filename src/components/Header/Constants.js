@@ -1,3 +1,3 @@
 export const TextConstants = {
-  title: 'Resserve',
+  title: 'Reseerve',
 };

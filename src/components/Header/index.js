@@ -21,7 +21,32 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#EA3F6A',
     flexDirection: 'row',
-    height: '8%',
+    height: '10%',
+  },
+  text: {
+    color: '#ffffff',
+  },
+});
+
+export const RestaurantHeader = (props) => {
+  return (
+    <View style={restaurantStyles.headerContainer}>
+      <Text style={restaurantStyles.text} category="h1">
+        {props.RestaurantName}
+      </Text>
+    </View>
+  );
+};
+
+const restaurantStyles = StyleSheet.create({
+  headerContainer: {
+    width: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#EA3F6A',
+    flexDirection: 'row',
+    height: '10%',
+    alignSelf: 'center',
   },
   text: {
     color: '#ffffff',
