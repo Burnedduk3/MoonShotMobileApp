@@ -1,19 +1,25 @@
-import React, { useContext, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { SafeAreaView, StyleSheet, TouchableWithoutFeedback } from 'react-native';
 import { StackActions } from '@react-navigation/native';
+import { ErrorPopUp } from '../../components/ErrorPopUp';
 import { TokenContext } from '../../Contexts/TokenContext';
 import { UserContext } from '../../Contexts/UserContext';
 import { TextConstants, queryConstants } from './QueryConstants';
-import { gql, useApolloClient } from '@apollo/client';
-import { Button, Card, Icon, Input, Layout, Modal, Spinner, Text } from '@ui-kitten/components';
+import { gql, useLazyQuery } from '@apollo/client';
+import { Button, Icon, Input, Layout, Spinner } from '@ui-kitten/components';
 
 export const LoginScreen = (props) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [secureTextEntry, setSecureTextEntry] = useState(true);
-  const [isloading, setLoading] = useState(false);
   const [error, setError] = useState(false);
-  const apolloClient = useApolloClient();
+  const [wrongUser, setWrongUser] = useState(false);
+  const [getLogin, { loading, data }] = useLazyQuery(
+    gql`
+      ${queryConstants.loginUsernamePassword}
+    `,
+    { fetchPolicy: 'network-only' },
+  );
   const { tokens, setTokens } = useContext(TokenContext);
   const { user, setUser } = useContext(UserContext);
 
@@ -25,74 +31,52 @@ export const LoginScreen = (props) => {
     props.navigation.dispatch(StackActions.replace('Home'));
   };
 
-  const onForgetPassword = async () => {};
-
   const onIconPress = () => {
     setSecureTextEntry(!secureTextEntry);
   };
 
   const onLogin = async () => {
-    setLoading(true);
-    try {
-      const { data } = await apolloClient.query({
-        query: gql`
-          ${queryConstants.loginUsernamePassword}
-        `,
-        variables: { username, password },
-      });
-      setLoading(false);
-      if (!data || !data.auth || !data.auth.login || !data.auth.login.loginWithUsernameAndPassword)
-        throw new Error('Something Happened');
-      if (!data.auth.login.loginWithUsernameAndPassword.error) {
-        setError(false);
-        setTokens({
-          accessToken: data.auth.login.loginWithUsernameAndPassword.data.accessToken,
-          refreshToken: data.auth.login.loginWithUsernameAndPassword.data.refreshToken,
-        });
-        setUser(data.auth.login.loginWithUsernameAndPassword.user);
-        if (!error && user && tokens) {
-          navigateMainContent();
-        }
-      } else {
-        setError(true);
-      }
-    } catch (e) {
-      setError(true);
-      setLoading(false);
-    }
+    getLogin({ variables: { username, password } });
   };
 
-  const renderLoginButton = () => {
-    return isloading ? (
-      <Spinner status="info" size="giant" />
-    ) : (
-      <Button onPress={onLogin} style={styles.button}>
-        {TextConstants.buttons.loginButton}
-      </Button>
-    );
+  useEffect(() => {
+    if (!loading && data) {
+      if (!data.auth || !data.auth.login || !data.auth.login.loginWithUsernameAndPassword) {
+        setError(true);
+      } else {
+        if (data.auth.login.loginWithUsernameAndPassword.error) {
+          setError(true);
+        } else {
+          if (
+            data.auth.login.loginWithUsernameAndPassword.user.role.name === 'business' ||
+            data.auth.login.loginWithUsernameAndPassword.user.role.name === 'admin'
+          ) {
+            setTokens({
+              accessToken: data.auth.login.loginWithUsernameAndPassword.data.accessToken,
+              refreshToken: data.auth.login.loginWithUsernameAndPassword.data.refreshToken,
+            });
+            setUser(data.auth.login.loginWithUsernameAndPassword.user);
+            if (!error && user && tokens) {
+              navigateMainContent();
+            }
+          } else {
+            setWrongUser(true);
+          }
+        }
+      }
+    }
+  }, [loading]);
+
+  const onModalPressed = () => {
+    setError(false);
+    setWrongUser(false);
   };
 
   const renderIcon = (props) => (
-    <TouchableWithoutFeedback onPress={onIconPress}>
+    <TouchableWithoutFeedback onPress={() => onIconPress()}>
       <Icon {...props} name={secureTextEntry ? 'eye-off' : 'eye'} />
     </TouchableWithoutFeedback>
   );
-
-  const renderErrorAtLogin = () => {
-    return error ? (
-      <Modal visible={error} backdropStyle={styles.backdrop} onBackdropPress={() => setError(false)}>
-        <Card disabled={true}>
-          <Text style={styles.modalText} category="h2">
-            {TextConstants.modal.text}
-          </Text>
-          <Button onPress={() => setError(false)}>{TextConstants.modal.button}</Button>
-        </Card>
-      </Modal>
-    ) : (
-      <></>
-    );
-  };
-
   return (
     <SafeAreaView style={styles.SafeAreaView}>
       <Layout style={styles.layout}>
@@ -113,11 +97,30 @@ export const LoginScreen = (props) => {
           secureTextEntry={secureTextEntry}
           style={styles.input}
         />
-        {renderErrorAtLogin()}
-        {renderLoginButton()}
-        <Button onPress={onForgetPassword} style={styles.button} appearance="primary">
-          {TextConstants.buttons.forgotPassword}
-        </Button>
+        {error && (
+          <ErrorPopUp
+            text={TextConstants.modal.text}
+            buttonText={TextConstants.modal.button}
+            onModalPressed={onModalPressed}
+          />
+        )}
+        {wrongUser && (
+          <ErrorPopUp
+            text={TextConstants.wrongUser.text}
+            buttonText={TextConstants.wrongUser.button}
+            onModalPressed={onModalPressed}
+          />
+        )}
+        {loading ? (
+          <Spinner status="info" size="giant" />
+        ) : (
+          <Button onPress={() => onLogin()} style={styles.button}>
+            {TextConstants.buttons.loginButton}
+          </Button>
+        )}
+        {/*<Button onPress= style={styles.button} appearance="primary">*/}
+        {/*  {TextConstants.buttons.forgotPassword}*/}
+        {/*</Button>*/}
         <Button onPress={goBack} style={styles.button} appearance="primary">
           {TextConstants.buttons.backHome}
         </Button>
@@ -145,9 +148,7 @@ const styles = StyleSheet.create({
     margin: 10,
     width: '70%',
   },
-  backdrop: {
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
+
   modalText: {
     margin: 10,
     fontSize: 15,

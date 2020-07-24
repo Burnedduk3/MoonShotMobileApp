@@ -8,6 +8,8 @@ const HomeIcon = (style) => <Icon {...style} name="home-outline" />;
 
 const ProfileIcon = (style) => <Icon {...style} name="person-outline" />;
 
+const RestaurantIcon = (style) => <Icon {...style} name="book-outline" />;
+
 const BottomTabBar = ({ navigation, state }) => {
   const onSelect = (index) => {
     navigation.navigate(state.routeNames[index]);
@@ -18,6 +20,7 @@ const BottomTabBar = ({ navigation, state }) => {
       <BottomNavigation selectedIndex={state.index} onSelect={onSelect}>
         <BottomNavigationTab title="Chekear" icon={HomeIcon} />
         <BottomNavigationTab title="Horario" icon={CalendarIcon} />
+        <BottomNavigationTab title="Restaurante" icon={RestaurantIcon} />
         <BottomNavigationTab title="Perfil" icon={ProfileIcon} />
       </BottomNavigation>
     </SafeAreaView>
