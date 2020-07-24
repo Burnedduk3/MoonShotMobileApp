@@ -24,6 +24,7 @@
     "graphql": "^15.3.0",
     "jsonwebtoken": "^8.5.1",
     "react": "~16.9.0",
+    "react-apollo": "^3.1.5",
     "react-dom": "~16.9.0",
     "react-native": "^0.61.4",
     "react-native-gesture-handler": "~1.6.0",

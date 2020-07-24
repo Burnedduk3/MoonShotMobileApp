@@ -1,23 +1,28 @@
 import { gql, useQuery } from '@apollo/client';
-import { Layout, Spinner, Text } from '@ui-kitten/components';
+import { Button, Spinner, Text } from '@ui-kitten/components';
 import React, { useContext, useEffect, useState } from 'react';
 import { SafeAreaView, StyleSheet } from 'react-native';
 import { View } from 'react-native';
 import { RestaurantHeader } from '../../components/Header';
 import { RestaurantContext } from '../../Contexts/RestaurantContext';
 import { TokenContext } from '../../Contexts/TokenContext';
-import { ViewText, getRestaurant } from './TextConstants';
+import { UserContext } from '../../Contexts/UserContext';
+import { ViewText, getRestaurant, updateRestaurantCapacity } from './TextConstants';
+import { DataContainer } from '../../components/RestaurantData';
+import { ManageCapacity } from '../../components/CapacityButton';
 
 export const ManageRestaurant = (props) => {
   const { tokens } = useContext(TokenContext);
   const { restaurant, setRestaurant } = useContext(RestaurantContext);
-  const [error, setError] = useState(false);
+  const [errors, setErrors] = useState(false);
+  const { user } = useContext(UserContext);
   const { loading, data } = useQuery(
     gql`
       ${getRestaurant}
     `,
     {
       fetchPolicy: 'network-only',
+      variables: { username: user.username },
       context: {
         headers: {
           authorization: `Bearer ${tokens.accessToken}`,
@@ -25,7 +30,6 @@ export const ManageRestaurant = (props) => {
       },
     },
   );
-
   useEffect(() => {
     if (!loading && data) {
       setRestaurant({
@@ -36,36 +40,53 @@ export const ManageRestaurant = (props) => {
         phoneNumber: data.Business.getMyRestaurant.data.phoneNumber,
         restaurantIdentifier: data.Business.getMyRestaurant.data.restaurantIdentifier,
       });
+      setErrors(false);
+    } else {
+      setErrors(true);
     }
   }, [loading]);
-
   return (
     <>
-      {!loading && !error && restaurant && (
+      {!loading && !errors && (
         <>
           <RestaurantHeader RestaurantName={restaurant.name} />
           <SafeAreaView style={styles.container}>
-            <View style={styles.dataContainer}>
-              <Text category="p1" style={styles.dataTitle}>
-                {ViewText.emptyPlaces.title}
-              </Text>
-              <Text category="p1" style={styles.dataText}>
-                {(restaurant.maxCapacity - restaurant.capacity).toString() + ViewText.emptyPlaces.postfix}
-              </Text>
-            </View>
-            <View style={styles.dataContainer}>
-              <Text category="p1" style={styles.dataTitle}>
-                {ViewText.capacity.title}
-              </Text>
-              <Text category="p1" style={styles.dataText}>
-                {restaurant.capacity.toString() + '/' + restaurant.maxCapacity.toString()}
-              </Text>
+            <DataContainer
+              title={ViewText.emptyPlaces.title}
+              data={(restaurant.maxCapacity - restaurant.capacity).toString() + ViewText.emptyPlaces.postfix}
+            />
+            <DataContainer
+              title={ViewText.capacity.title}
+              data={restaurant.capacity + '/' + restaurant.maxCapacity.toString()}
+            />
+            <View style={styles.buttons}>
+              <ManageCapacity
+                StyleButton={styles.button}
+                text="+"
+                action="add"
+                restaurantId={restaurant.restaurantIdentifier}
+                mutation={updateRestaurantCapacity}
+                accessToken={tokens.accessToken}
+              />
+              <ManageCapacity
+                StyleButton={styles.button}
+                text="-"
+                action="substraction"
+                restaurantId={restaurant.restaurantIdentifier}
+                mutation={updateRestaurantCapacity}
+                accessToken={tokens.accessToken}
+              />
             </View>
           </SafeAreaView>
         </>
       )}
-      {loading && <Spinner size="giant" />}
-      {error && <Text category="h2">Something Has happened</Text>}
+      {loading && (
+        <>
+          <RestaurantHeader RestaurantName="loading" />
+          <Spinner size="giant" />
+        </>
+      )}
+      {errors && !loading && <Text category="h2">Something Has happened</Text>}
     </>
   );
 };
@@ -78,24 +99,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  dataContainer: {
-    flexDirection: 'column',
+  buttons: {
+    flexDirection: 'row',
     width: '80%',
-    height: '12%',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#EA3F6A',
-    borderRadius: 20,
-    marginBottom: 20,
+    justifyContent: 'space-evenly',
   },
-  dataTitle: {
-    color: '#EA3F6A',
-    marginBottom: 5,
-    fontSize: 20,
-  },
-  dataText: {
-    color: '#EA3F6A',
-    fontSize: 20,
+  button: {
+    width: 70,
+    height: 70,
   },
 });

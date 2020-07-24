@@ -1,7 +1,7 @@
 export const getRestaurant = `
-query{
+query($username:String!){
   Business{
-    getMyRestaurant(data:{username:"JuanPer"}){
+    getMyRestaurant(data:{username:$username}){
       error
       message
       data{
@@ -11,6 +11,23 @@ query{
         address
         phoneNumber
         maxCapacity
+        capacity
+      }
+    }
+  }
+}
+`;
+
+export const updateRestaurantCapacity = `
+mutation($action: String!, $restaurantId: String!) {
+  business {
+    updateCapacity(
+      action: $action
+      data: { restaurantId: $restaurantId}
+    ) {
+      error
+      message
+      data {
         capacity
       }
     }
