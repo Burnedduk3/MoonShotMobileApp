@@ -11,6 +11,7 @@ import { HomeScreen } from '../../views/Home';
 import { LoginScreen } from '../../views/Login';
 import { ManageRestaurant } from '../../views/ManageRestaurant';
 import { Me } from '../../views/Me';
+import { ReservationInfo } from '../../views/ReservationInfo';
 import { SeeCalendar } from '../../views/ReservationPanel';
 import BottomTabBar from '../TabBar';
 
@@ -30,6 +31,7 @@ const HomeNavigator = () => (
     <Stack.Screen name="Home" component={HomeScreen} />
     <Stack.Screen name="Login" component={LoginScreen} />
     <Stack.Screen name="mainContent" component={TabNavigator} />
+    <Stack.Screen name="CheckReservation" component={ReservationInfo} />
   </Stack.Navigator>
 );
 export const AppNavigator = () => {

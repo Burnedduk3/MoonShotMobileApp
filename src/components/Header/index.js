@@ -1,4 +1,5 @@
-import { Text } from '@ui-kitten/components';
+import { StackActions } from '@react-navigation/native';
+import { Icon, Text, TopNavigation, TopNavigationAction } from '@ui-kitten/components';
 import React from 'react';
 import { StyleSheet } from 'react-native';
 import { View } from 'react-native';
@@ -50,5 +51,24 @@ const restaurantStyles = StyleSheet.create({
   },
   text: {
     color: '#ffffff',
+  },
+});
+
+export const TopSimpleHeader = (props) => {
+  const BackIcon = (props) => <Icon {...props} name="arrow-back" />;
+  const BackAction = () => (
+    <TopNavigationAction
+      icon={BackIcon}
+      onPress={() => props.navigation.dispatch(StackActions.replace('mainContent'))}
+    />
+  );
+  return (
+    <TopNavigation style={restaurantStylesSimple.headerContainer} accessoryLeft={BackAction} title="Datos Reserva" />
+  );
+};
+
+const restaurantStylesSimple = StyleSheet.create({
+  headerContainer: {
+    backgroundColor: '#ffffff',
   },
 });

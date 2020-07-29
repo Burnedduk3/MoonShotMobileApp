@@ -1,5 +1,5 @@
 import { gql, useQuery } from '@apollo/client';
-import { Button, Spinner, Text } from '@ui-kitten/components';
+import { Spinner, Text } from '@ui-kitten/components';
 import React, { useContext, useEffect, useState } from 'react';
 import { SafeAreaView, StyleSheet } from 'react-native';
 import { View } from 'react-native';
@@ -11,11 +11,12 @@ import { ViewText, getRestaurant, updateRestaurantCapacity } from './TextConstan
 import { DataContainer } from '../../components/RestaurantData';
 import { ManageCapacity } from '../../components/CapacityButton';
 
-export const ManageRestaurant = (props) => {
+export const ManageRestaurant = () => {
   const { tokens } = useContext(TokenContext);
   const { restaurant, setRestaurant } = useContext(RestaurantContext);
   const [errors, setErrors] = useState(false);
   const { user } = useContext(UserContext);
+  const [buttonLoading, setButtonLoading] = useState(false);
   const { loading, data } = useQuery(
     gql`
       ${getRestaurant}
@@ -30,6 +31,7 @@ export const ManageRestaurant = (props) => {
       },
     },
   );
+
   useEffect(() => {
     if (!loading && data) {
       setRestaurant({
@@ -60,22 +62,28 @@ export const ManageRestaurant = (props) => {
               data={restaurant.capacity + '/' + restaurant.maxCapacity.toString()}
             />
             <View style={styles.buttons}>
-              <ManageCapacity
-                StyleButton={styles.button}
-                text="+"
-                action="add"
-                restaurantId={restaurant.restaurantIdentifier}
-                mutation={updateRestaurantCapacity}
-                accessToken={tokens.accessToken}
-              />
-              <ManageCapacity
-                StyleButton={styles.button}
-                text="-"
-                action="substraction"
-                restaurantId={restaurant.restaurantIdentifier}
-                mutation={updateRestaurantCapacity}
-                accessToken={tokens.accessToken}
-              />
+              <>
+                <ManageCapacity
+                  StyleButton={styles.button}
+                  text="-"
+                  action="substraction"
+                  restaurantId={restaurant.restaurantIdentifier}
+                  mutation={updateRestaurantCapacity}
+                  accessToken={tokens.accessToken}
+                  buttonLoading={setButtonLoading}
+                  disabled={buttonLoading}
+                />
+                <ManageCapacity
+                  StyleButton={styles.button}
+                  text="+"
+                  action="add"
+                  restaurantId={restaurant.restaurantIdentifier}
+                  mutation={updateRestaurantCapacity}
+                  accessToken={tokens.accessToken}
+                  buttonLoading={setButtonLoading}
+                  disabled={buttonLoading}
+                />
+              </>
             </View>
           </SafeAreaView>
         </>

@@ -1,14 +1,25 @@
 export const QueryConstants = {
-  refreshTokenQuery: `
-    query refreshToken($refreshToken: String!) {
-      refreshToken(data: { refreshToken: $refreshToken }) {
-        error
-        data {
-          accessToken
-          refreshToken
+  getReservation: `
+query getReservationID ($reservationId:String!){
+  user{
+    getReservationById(data:{reservationId:$reservationId}){
+      error
+      data{
+        id
+        reservationIdentifier
+        peopleQuantities
+        reservationTime
+        owner{
+          phone
+          username
+          firstName
+          firstLastname
+          email
         }
-        message
       }
+      message
     }
+  }
+}
   `,
 };
